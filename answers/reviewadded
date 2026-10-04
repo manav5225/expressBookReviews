@@ -1,0 +1,2 @@
+﻿$ curl -s -b cookies.txt -X PUT http://localhost:5000/customer/auth/review/1 -H "Content-Type: application/json" -d "@review.json"
+{"message":"Review added/updated successfully","book":{"author":"Chinua Achebe","title":"Things Fall Apart","reviews":{"testuser":"Excellent book"}}}

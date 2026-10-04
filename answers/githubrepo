@@ -1,0 +1,10 @@
+﻿$ curl -s https://api.github.com/repos/manav5225/expressBookReviews | ConvertFrom-Json | Select-Object full_name, fork, @{n="parent";e={$_.parent.full_name}} | Format-List
+
+
+full_name : manav5225/expressBookReviews
+fork      : True
+parent    : ibm-developer-skills-network/expressB
+            ookReviews
+
+
+

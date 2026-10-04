@@ -1,0 +1,2 @@
+﻿$ curl -s -X POST http://localhost:5000/register -H "Content-Type: application/json" -d "@user.json"
+{"message":"User already exists"}
