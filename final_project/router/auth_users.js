@@ -5,17 +5,15 @@ const regd_users = express.Router();
 
 let users = [];
 
-// Returns true if the username is not already taken
 const isValid = (username) => {
-  return !users.some((user) => user.username === username);
+  return users.some((u) => u.username === username);
 };
 
-// Returns true if username and password match a registered user
 const authenticatedUser = (username, password) => {
-  return users.some((user) => user.username === username && user.password === password);
+  return users.some((u) => u.username === username && u.password === password);
 };
 
-// Only registered users can login
+// Login
 regd_users.post("/login", (req, res) => {
   const { username, password } = req.body;
 
@@ -23,19 +21,18 @@ regd_users.post("/login", (req, res) => {
     return res.status(400).json({ message: "Username and password are required" });
   }
   if (!authenticatedUser(username, password)) {
-    return res.status(401).json({ message: "Invalid login. Check username and password" });
+    return res.status(401).json({ message: "Invalid username or password" });
   }
 
-  const accessToken = jwt.sign({ username }, "access", { expiresIn: 60 * 60 });
+  const accessToken = jwt.sign({ data: password }, 'access', { expiresIn: 60 * 60 });
   req.session.authorization = { accessToken, username };
-
-  return res.status(200).json({ message: "User successfully logged in", accessToken });
+  return res.status(200).json({ message: "User successfully logged in" });
 });
 
 // Add or modify a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   const isbn = req.params.isbn;
-  const review = req.query.review || req.body.review;
+  const review = req.query.review;
   const username = req.session.authorization.username;
 
   if (!books[isbn]) {
@@ -47,12 +44,12 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
   books[isbn].reviews[username] = review;
   return res.status(200).json({
-    message: `The review for the book with ISBN ${isbn} has been added/updated`,
+    message: `Review for book ${isbn} added/updated successfully`,
     reviews: books[isbn].reviews
   });
 });
 
-// Delete a book review (only the logged-in user's own review)
+// Delete your own review
 regd_users.delete("/auth/review/:isbn", (req, res) => {
   const isbn = req.params.isbn;
   const username = req.session.authorization.username;
@@ -65,9 +62,7 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
   }
 
   delete books[isbn].reviews[username];
-  return res.status(200).json({
-    message: `Review for the book with ISBN ${isbn} posted by the user ${username} deleted`
-  });
+  return res.status(200).json({ message: `Review for book ${isbn} deleted successfully` });
 });
 
 module.exports.authenticated = regd_users;
